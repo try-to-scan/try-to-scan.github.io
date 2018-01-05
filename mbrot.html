@@ -26,9 +26,9 @@
     		context.fillRect(0, 0, canvas.width, canvas.height);
     		context.imageSmoothingEnabled = true;
     		
-            canvas.onmousedown = canvasOnmousedown;
-            canvas.onmouseup = canvasOnmouseup;
-            canvas.onmousemove = canvasOnmousemove;
+            canvas.touchstart = canvasOnmousedown;
+            canvas.touchend = canvasOnmouseup;
+            canvas.touchmove = canvasOnmousemove;
         };
         var canvasOnmousedown = function(e){
         	mouseDown.x = e.x;
@@ -310,7 +310,7 @@
 </div>
 
 <canvas id="canvas" width="800" height="600"></canvas>
-<canvas id="canvas1" width="1860" height="900"></canvas>
+<!--canvas id="canvas1" width="1860" height="900"></canvas-->
 
 </body>
 </html>
