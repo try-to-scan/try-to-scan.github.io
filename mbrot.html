@@ -26,9 +26,9 @@
     		context.fillRect(0, 0, canvas.width, canvas.height);
     		context.imageSmoothingEnabled = true;
     		
-            canvas.touchstart = canvasOnmousedown;
-            canvas.touchend = canvasOnmouseup;
-            canvas.touchmove = canvasOnmousemove;
+            canvas.onmousedown = canvasOnmousedown;
+            canvas.onmouseup = canvasOnmouseup;
+            canvas.onmousemove = canvasOnmousemove;
         };
         var canvasOnmousedown = function(e){
         	mouseDown.x = e.x;
