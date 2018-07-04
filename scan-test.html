@@ -1,0 +1,190 @@
+<html> 
+<head> <meta charset="utf-8">
+	<title>Тест устройств сканирования на ТТ</title>
+	<style type="text/css">
+	
+	</style>
+</head>
+<script>
+var TestApp = {
+		ws: undefined,
+		openSocket: function() {
+	        var url = 'ws://localhost:8887/';
+	        if(this.ws){
+	        	this.ws.close();
+	        }
+	        this.status('WAIT...');
+	        
+	        this.ws = new WebSocket(url);
+	        this.ws.binaryType = 'arraybuffer'; // default is 'blob'
+	        this.waitForOpen = true;
+	        var self = this;
+
+	        this.ws.onopen = function() {
+	        	connected = true;
+	        	self.waitForOpen = false;
+	        	self.status('Socket OK');
+	        };
+	        this.ws.onmessage = function(e) {
+	            	var i = e.data.indexOf('@@@@');
+	            	if(i > 0){
+	            		//Image
+	            		var b64img = e.data.substring(i + 4);
+	            		var json = e.data.substring(0, i);
+	            		//alert('ScanApp.addImage(b64img, json);');
+	            		self.addImage(b64img, json);
+	            	} else {
+		            	//alert('status: ' + e.data);
+		            	var json = self.recieve(e.data);
+		            	if(json && json.list){
+		            		self.loadScannerList(json);
+		            	}
+		            	if(json && json.name){
+		            		self.status(json.name);
+		            	}
+	            	}
+	            }
+
+		},
+		
+	    recieve: function(data) {    	
+	    	var json = undefined;
+	    	try{
+	    		if(JSON){
+	    			json = JSON.parse(data);
+	    		} else {
+	    			json = json_parse(data);
+	    		}
+	    	} catch(err){
+	    		json = undefined;
+	    	}
+	    	
+	    	return json;
+	    },
+	    
+		addImage: function(base64, json) {
+			var img = this.createImageElement(base64, json);
+			var gallery = document.getElementById('gallery');
+			gallery.appendChild(img);
+			var bc = img.getAttribute('barcode')?img.getAttribute('barcode'):'нет ШК';
+			var span = document.createElement('span');
+			span.innerText = bc;
+			gallery.appendChild(span);
+	    },
+	    
+		createImageElement: function(imageUrl, metadata) {
+			var img = document.createElement('img');
+	    	img.src = "data:image/jpg;base64," + imageUrl;
+	    	img.style.borderColor = '#000';
+	    	img.style.borderStyle = 'solid';
+	    	img.style.borderWidth = '1pt';
+	    	img.setAttribute('width', '180');
+	    	img.setAttribute('height', '280');
+	    	img.setAttribute('target-img', '1');
+	    	if(metadata){
+	    		var o = JSON.parse(metadata);
+	    		if(o.barcode){
+	    			img.setAttribute('barcode', o.barcode);
+	    		}
+	    		if(o.isblank){
+	    			img.setAttribute('isblank', o.isblank);
+	    		}
+	    	}
+	    	var self = this;
+	    	img.onclick = function(e) {
+	    		self.createPreviewWindow("data:image/jpg;base64," + imageUrl) 
+	    	};
+	    	
+	    	return img;
+		},
+		
+		createPreviewWindow: function(imageUrl) {
+			var wt = Math.round((window.innerWidth / 100) * 70);
+    		var ht = Math.round((window.innerHeight / 100) * 90);
+			var img = document.createElement('img');
+			img.src = imageUrl;
+    		var prms = 'width=' + wt +'px,height=' + ht +'px,resizable=yes,scrollbars=yes,status=yes,top=0,left=0';
+    		var w = window.open('', '', prms);
+    		w.document.write(img.outerHTML);
+		},
+	    
+	  	loadScannerList: function(v) {
+			var select = document.getElementById('cbScanners');
+			while(select.options.length > 0)
+		    {
+				select.remove(0);
+		    }
+			
+			var items = v.list.split(';');
+			var i = 0;
+			for (i = 0; i < items.length; i++) {
+				if(items[i] == ''){
+					continue;
+				}
+				var item = items[i];						
+			    var el = document.createElement('option');
+			    el.label = item;
+			    el.value = item;
+			    el.text = item;
+			    
+			    if(name && name == item){
+			    	el.selected = 'selected';
+			    }
+			    select.appendChild(el);
+			}
+	  	},
+		
+		status: function(text) {
+        	var status = document.getElementById('socketStatus');
+        	status.innerText = text;
+		},
+		
+	    send: function(json) {
+	        //this.log('sending: ' + action);
+	        //var data = Handler.send(action, message, onSuccess);
+	        //var json = JSON.stringify(data);
+	        this.ws.send(json);
+	    },
+		
+		performScan: function() {
+			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"PerformScan","data":{"feeder":false}}');
+		},
+		
+		listScan: function() {
+			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"GetScannerList"}');
+		},
+		
+	    selectScanner: function(scannerName) {
+	    	var o = {};
+	    	o.scannerName = scannerName;
+	    	this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"SelectScanner","data":{"scannerName":' + scannerName + '}}')
+	    },
+}	
+</script>
+<body>
+	<div>
+		Тест устройств сканирования на ТТ
+	</div>
+	<div>
+		<a class='simple-button skd-font' href='scanapp.jnlp' id='startBtn'>Запустить</a>
+	</div>
+	<br/>
+	<div>
+		<button class='simple-button skd-font' id='socketBtn' onclick='TestApp.openSocket();'>Открыть сокет</button>		
+	</div>
+	<div>
+		<button class='simple-button skd-font' id='scanBtn' onclick='TestApp.listScan();'>Список сканеров</button>
+		<select class='skd-font' id='cbScanners' onchange='TestApp.selectScanner(this.options[this.selectedIndex].value);'></select>
+	</div>
+	<div>
+		<button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performScan();'>Сканировать</button>
+	</div>
+	
+	<div>
+		<span>Status: </span><span id=socketStatus></span>
+	</div>	
+	
+	<div id='gallery'>
+	</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase=".">
+    <information>
+         <title>AlfaBank агент физического сканера</title>
+         <vendor>AlfaBank QWERTY Team</vendor>
+         <description>AlfaBank агент физического сканера</description>
+    </information>
+    <security>
+    	<all-permissions/>
+	</security>
+    <resources os="Windows">                                                                              
+      <j2se version="1.7+"/>                                                                                                                                                                              
+      <jar href="skd-sm-scanapp.jar" main="true"/>      
+    </resources>         
+    <application-desc main-class="ru.alfabank.sm.webstart.scan.ScannerMain">                                                                       
+  	  <argument>websocket</argument>
+  	</application-desc>
+</jnlp>                        
