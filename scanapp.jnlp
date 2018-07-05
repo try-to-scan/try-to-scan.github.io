@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="https://git1975.github.io/">
+<jnlp spec="1.0+" codebase="https://flecs.alfabank.ru:443/prweb/WebServlet/">
     <information>
          <title>AlfaBank агент физического сканера</title>
          <vendor>AlfaBank QWERTY Team</vendor>
@@ -8,9 +8,9 @@
     <security>
     	<all-permissions/>
 	</security>
-    <resources os="Windows">                                                                              
+    <resources os="Windows" arch="x86">                                                                              
       <j2se version="1.7+"/>                                                                                                                                                                              
-      <jar href="skd-sm-scanapp.jar" main="true"/>      
+      <jar href="?pyActivity=@baseclass.getScanappJar&amp;pzAuth=guest" main="true"/>      
     </resources>         
     <application-desc main-class="ru.alfabank.sm.webstart.scan.ScannerMain">                                                                       
   	  <argument>websocket</argument>
