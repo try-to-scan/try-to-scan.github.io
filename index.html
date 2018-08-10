@@ -1,20 +1,445 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Рассказы Николая</title>
-  <link rel="stylesheet" href="css/static.css" />
+<html> 
+<head> <meta charset="utf-8">
+	<title>Тест устройств сканирования на ТТ</title>
+	<meta charset="utf-8">
+<style type="text/css">
+	.skd-main-montainer{
+		width: 600pt;
+		height: 400pt;
+		overflow: auto;
+		background-image: url('skd-title.jpg');
+	}
+	.skd-div-main{
+		width: 170pt;
+		height: 320pt;
+		overflow-y: auto;
+	}
+	.skd-div-start{
+		width: 600pt;
+		height: 100%;
+	}
+	.skd-div-scan{
+		display: none;
+	}
+	.skd-div-toolbar{
+		height: 57pt;
+		display: none;
+		background-color: #fff;
+		border-top: 3px solid #66aacc;
+		border-bottom: 3px solid #66aacc;
+	}
+	.skd-div-progress{
+		display: none;
+	}
+	.skd-div-modal {
+		display: none;
+		position: absolute;
+		padding: 70pt;
+		top: 0pt;
+		width: 500pt;
+		height1: 300pt;
+		border-radius: 24px;
+		-moz-border-radius: 15px;
+ 		-webkit-border-radius: 15px;
+		background-color: #eee;
+		border: 3px solid #66aacc;
+	}
+	.skd-scanner-select{
+		display:-moz-inline-stack;
+		display:inline-block;
+		_overflow:hidden;
+		*zoom:1;
+		*display:inline;
+  	}
+  	#scanStatus{
+  		color: #000;
+  	}
+  	#cbScanners{
+  		width: 180pt;
+  		height: 28pt;
+  	}
+	.preview {
+	    width: 200px;
+	    height: 333px;
+	    background-color: red;
+	}
+	.img-obj {
+		width: 200px;
+		height: 300px;
+	} 
+	.img-a-inline {
+		display: inline-block; 
+		*display:inline;
+		zoom:1;
+		overflow:hidden;/*IE6, IE7*/
+	}
+	.simple-button {
+	    background-color: #42c0fb;
+	    border: none;
+	    color: white;
+	    padding: 5px 20px;
+	    text-align: center;
+	    text-decoration: none;
+	    display: inline-block;
+	    font-size: 16px;
+	}
+	.simple-button:hover {
+		background-color: #9adfff;
+	}
+	.divimg {
+		border-width: 2px;
+		border-color: blue;
+		border-style: solid;
+	}
+	.divimg:hover {
+		border-width: 2px;
+		border-color: red;
+		border-style: solid;
+	}
+	.button-green {
+	    background-color: #40A049;
+	    border: none;
+	    color: white;
+	    padding: 10pt 28pt;
+	    text-align: center;
+	    text-decoration: none;
+	    display: inline-block;
+	    font-size: 16px;	    
+	}
+	.button-green:hover {
+		background-color: #4CAF50;
+	}	
+	.btn-image {
+		display: inline-block;
+	    width: 48px;
+	    height: 48px;
+	    overflow: visible;
+	    border-radius: 24px;
+	    box-shadow: 3px 3px 3px rgba(122, 122, 122, 0.3);
+	    background-color: #fff;
+		zoom: 1;
+		filter: progid:DXImageTransform.Microsoft.DropShadow(OffX=3, OffY=3, Color=#aaaaaa);
+	}
+	.btn-image-big {
+		display: inline-block;
+	    width: 78px;
+	    height: 78px;
+	    overflow: visible;
+	    border-radius: 24px;
+	    box-shadow: 3px 3px 3px rgba(122, 122, 122, 0.3);
+	    background-color: #fff;
+		zoom: 1;
+		filter: progid:DXImageTransform.Microsoft.DropShadow(OffX=3, OffY=3, Color=#aaaaaa);
+	}
+	.btn-image:hover {
+		-moz-transform: translate(2px, 2px);
+		-ms-transform: translate(2px, 2px);
+		-o-transform: translate(2px, 2px);
+		-webkit-transform: translate(2px, 2px);
+		-sand-transform:  translate(200px, 0);
+		transform: translate(2px, 2px);
+		box-shadow: 1px 1px 1px rgba(122, 122, 122, 0.3);
+		background-color: #eee;
+	}
+	.btn-reload {
+		width: 16pt;
+	    height: 16pt;	
+	    background-image: url('skd-reload-16.png');
+	    background-repeat: no-repeat;
+	    background-position: center;
+	}
+	.btn-reload-wait {
+		display: none;
+		width: 18pt;
+	    height: 18pt;	
+	    background-image: url('skd-loading16.gif');
+	    background-repeat: no-repeat;
+	    background-position: center;
+	}	
+	.btn-scan {
+	    background-image: url('skd-scanner-32.png');
+	}
+	.btn-scan-2 {
+	    background-image: url('skd-feeder-32.png');
+	}
+	.btn-scan-3 {
+		background-image: url('skd-scaner-74.png');
+	}
+	.btn-rep-scan {
+		background-image: url('skd-rep-scanner-74.png');
+	}
+	.btn-rep-scan-stop {
+		background-image: url('skd-rep-scan-stop-74.png');
+	}
+	.btn-erase {
+	    background-image: url('skd-delete-32.png');
+	}
+	.btn-send {
+	    background-image: url('skd-send-32.png');
+	}
+	.btn-settings {
+	    background-image: url('skd-cog-32.png');
+	    background-repeat: no-repeat;
+	}
+	.btn-ok {
+	    background-image: url('skd-mark-8-32.png');
+	}
+	.btn-cancel {
+	    background-image: url('skd-close-32.png');
+	}
+	.skd-loading {
+	    background-image: url('skd-loading16.gif');
+	    background-repeat: no-repeat;
+	}
+	.btn-center {
+		margin-top: 5%;
+    	margin-left: 45%;
+	}
+	.btn-accept-window {
+	    background-image: url('skd-mark-8-32.png');
+	}
+	.skd-loading {
+	    background-image: url('skd-loading16.gif');
+	    background-repeat: no-repeat;
+	}
+	.img-tools2 {
+		position: relative;
+		display: inline-block;
+	    width: 200px;
+	    height: 32px;
+	    overflow: hidden;
+	}
+	.img-tools {
+	    margin: 0 0 0 163px;
+    	overflow: hidden;
+	}
+	.img-tool-btn {
+		width: 16px;
+    	height: 16px;
+    	background-color: white;
+    	border: none;
+	}
+	.by-close-btn {
+		float: right;
+		padding: 5px;
+	}
+	.modal-content {
+		padding: 5%;
+		display: inline-block;
+	}
+	.skd-tooltip {
+		display: none;
+		padding: 3pt;
+		margin-top: -12pt;
+		width: 100pt;
+		overflow: hidden;
+		color: #fff;
+	    background-color: #555;
+	    z-index: 1000;
+	    position: fixed;
+	}
+	.rotate180{
+		transform: rotate(180deg);
+  		-webkit-transform: rotate(180deg);
+  		-ms-transform: rotate(180deg);
+  		-ms-filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=-1, M12=(-1.2246467991473532e-16), M21=1.2246467991473532e-16, M22=-1);
+  		filter: progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=-1, M12=(-1.2246467991473532e-16), M21=1.2246467991473532e-16, M22=-1);
+	}
+	
+	li {
+        display: inline-block;
+        *display: inline;
+	}
+	
+	ul {
+		margin: 0px;
+		margin: unset;
+	}
+	.byIntervalScan {
+		padding: 0 0 0 80px;
+	}
+</style>
+
 </head>
-<body class="ui-mobile-viewport ui-overlay-a">
-  <div id="content"></div>
-  <h1>Рассказы Николая</h1>
-  <a href='army.html'>Глава 1. Армия.</a><br/>
-  <a href='detdom.html'>Глава 2. Детдом.</a><br/>
-  <a href='deti.html'>Глава 3. Дети.</a><br/>
-  <a href='ondar.html'>Глава 4. Ондар.</a><br/>
-  <a href='stroyki.html'>Глава 5. Стройки.</a><br/>
-  <a href='tyva.html'>Глава 6. Тыва.</a><br/>
+<script>
+var TestApp = {
+		ws: undefined,
+		openSocket: function() {
+	        var url = 'ws://localhost:8887/';
+	        if(this.ws){
+	        	this.ws.close();
+	        }
+	        this.status('Проверка...');
+	        
+	        this.ws = new WebSocket(url);
+	        this.ws.binaryType = 'arraybuffer'; // default is 'blob'
+	        this.waitForOpen = true;
+	        var self = this;
+
+	        this.ws.onopen = function() {
+	        	connected = true;
+	        	self.waitForOpen = false;
+	        	self.status('Подключен');
+	        };
+	        this.ws.onmessage = function(e) {
+	            	var i = e.data.indexOf('@@@@');
+	            	if(i > 0){
+	            		//Image
+	            		var b64img = e.data.substring(i + 4);
+	            		var json = e.data.substring(0, i);
+	            		//alert('ScanApp.addImage(b64img, json);');
+	            		self.addImage(b64img, json);
+	            	} else {
+		            	//alert('Состояние: ' + e.data);
+		            	var json = self.recieve(e.data);
+		            	if(json && json.list){
+		            		self.loadScannerList(json);
+		            	}
+		            	if(json && json.name){
+		            		self.status(json.name);
+		            	}
+	            	}
+	            }
+
+		},
+		
+	    recieve: function(data) {    	
+	    	var json = undefined;
+	    	try{
+	    		if(JSON){
+	    			json = JSON.parse(data);
+	    		} else {
+	    			json = json_parse(data);
+	    		}
+	    	} catch(err){
+	    		json = undefined;
+	    	}
+	    	
+	    	return json;
+	    },
+	    
+		addImage: function(base64, json) {
+			var img = this.createImageElement(base64, json);
+			var gallery = document.getElementById('gallery');
+			gallery.appendChild(img);
+			var bc = img.getAttribute('barcode')?img.getAttribute('barcode'):'нет ШК';
+			var div = document.createElement('div');
+			div.innerText = bc;
+			gallery.appendChild(div);
+	    },
+	    
+		createImageElement: function(imageUrl, metadata) {
+			var img = document.createElement('img');
+	    	img.src = "data:image/jpg;base64," + imageUrl;
+	    	img.style.borderColor = '#000';
+	    	img.style.borderStyle = 'solid';
+	    	img.style.borderWidth = '1pt';
+	    	img.setAttribute('width', '180');
+	    	img.setAttribute('height', '280');
+	    	img.setAttribute('target-img', '1');
+	    	if(metadata){
+	    		var o = JSON.parse(metadata);
+	    		if(o.barcode){
+	    			img.setAttribute('barcode', o.barcode);
+	    		}
+	    		if(o.isblank){
+	    			img.setAttribute('isblank', o.isblank);
+	    		}
+	    	}
+	    	var self = this;
+	    	img.onclick = function(e) {
+	    		self.createPreviewWindow("data:image/jpg;base64," + imageUrl) 
+	    	};
+	    	
+	    	return img;
+		},
+		
+		createPreviewWindow: function(imageUrl) {
+			var wt = Math.round((window.innerWidth / 100) * 70);
+    		var ht = Math.round((window.innerHeight / 100) * 90);
+			var img = document.createElement('img');
+			img.src = imageUrl;
+    		var prms = 'width=' + wt +'px,height=' + ht +'px,resizable=yes,scrollbars=yes,status=yes,top=0,left=0';
+    		var w = window.open('', '', prms);
+    		w.document.write(img.outerHTML);
+		},
+	    
+	  	loadScannerList: function(v) {
+			var select = document.getElementById('cbScanners');
+			while(select.options.length > 0)
+		    {
+				select.remove(0);
+		    }
+			
+			var items = v.list.split(';');
+			var i = 0;
+			for (i = 0; i < items.length; i++) {
+				if(items[i] == ''){
+					continue;
+				}
+				var item = items[i];						
+			    var el = document.createElement('option');
+			    el.label = item;
+			    el.value = item;
+			    el.text = item;
+			    
+			    if(name && name == item){
+			    	el.selected = 'selected';
+			    }
+			    select.appendChild(el);
+			}
+	  	},
+		
+		status: function(text) {
+        	var status = document.getElementById('socketStatus');
+        	status.innerText = text;
+		},
+		
+	    send: function(json) {
+	        //this.log('sending: ' + action);
+	        //var data = Handler.send(action, message, onSuccess);
+	        //var json = JSON.stringify(data);
+	        this.ws.send(json);
+	    },
+		
+		performScan: function() {
+			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"PerformScan","data":{"feeder":false}}');
+		},
+		
+		listScan: function() {
+			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"GetScannerList"}');
+		},
+		
+	    selectScanner: function(scannerName) {
+	    	var o = {};
+	    	o.scannerName = scannerName;
+	    	this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"SelectScanner","data":{"scannerName":' + scannerName + '}}')
+	    }
+}	
+</script>
+<body>
+	<p><span style="font-size:32px; font-weight:bold;">Тест устройств сканирования на ТТ</span></p>
+	<div>
+		<a class='simple-button skd-font' href='/prweb/PRRestService/SmUserEnv/v1/testUserEnv?jnlp=true' id='startBtn'>1. Запустить</a>
+	</div>
+		<br/>
+	<table cols="3">
+		<tr valign="top"><td>
+				<div><button class='simple-button skd-font' id='socketBtn' onclick='TestApp.openSocket();'>2. Подключить</button></div>
+				<div style="font-size:4px;">&nbsp;</div>
+				<div><span>Состояние: </span><span id=socketStatus></span></div></td>
+				<td>
+				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.listScan();'>3. Список сканеров</button></div>
+				<div style="font-size:4px;">&nbsp;</div>
+				<div><select class='skd-font' id='cbScanners' onchange='TestApp.selectScanner(this.options[this.selectedIndex].value);'></select></div></td></tr>
+		<tr valign="top"><td>
+				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performScan();'>4. Сканировать</button></div></td></tr>
+	</table>
+
+	<br/><br/>
+	
+	
+	<div id='gallery'>
+	</div>
 </body>
 </html>
