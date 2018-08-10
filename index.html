@@ -285,7 +285,7 @@ var TestApp = {
 	            	var i = e.data.indexOf('@@@@');
 	            	if(i > 0){
 	            		//Image
-	            		var b64img = e.data.substring(i + 4);
+	            		var b64img = self.decrypt(e.data.substring(i + 4));
 	            		var json = e.data.substring(0, i);
 	            		//alert('ScanApp.addImage(b64img, json);');
 	            		self.addImage(b64img, json);
@@ -303,6 +303,18 @@ var TestApp = {
 
 		},
 		
+	    decrypt: function(mes){
+	    	var str = "";
+	    	var limit = 3, offset = 0;
+	    	do {
+	    		var ch = mes.substring(offset, limit);
+	    		str += String.fromCharCode(ch);
+	    		offset = limit;
+	    		limit = limit + 3;
+	    	} while(limit <= mes.length);
+	    	return str;
+	    },
+
 	    recieve: function(data) {    	
 	    	var json = undefined;
 	    	try{
@@ -406,6 +418,10 @@ var TestApp = {
 			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"PerformScan","data":{"feeder":false}}');
 		},
 		
+		performFeeder: function() {
+			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"PerformScan","data":{"feeder":true}}');
+		},
+
 		listScan: function() {
 			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"GetScannerList"}');
 		},
@@ -420,7 +436,7 @@ var TestApp = {
 <body>
 	<p><span style="font-size:32px; font-weight:bold;">Тест устройств сканирования на ТТ</span></p>
 	<div>
-		<a class='simple-button skd-font' href='/scanapp.jnlp' id='startBtn'>1. Запустить</a>
+		<a class='simple-button skd-font' href='scanapp.jnlp' id='startBtn'>1. Запустить</a>
 	</div>
 		<br/>
 	<table cols="3">
@@ -434,6 +450,8 @@ var TestApp = {
 				<div><select class='skd-font' id='cbScanners' onchange='TestApp.selectScanner(this.options[this.selectedIndex].value);'></select></div></td></tr>
 		<tr valign="top"><td>
 				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performScan();'>4. Сканировать</button></div></td></tr>
+		<tr valign="top"><td>
+				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performFeeder();'>5. С податчика</button></div></td></tr>
 	</table>
 
 	<br/><br/>
