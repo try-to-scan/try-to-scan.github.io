@@ -78,13 +78,14 @@
 	    border: none;
 	    color: white;
 	    padding: 5px 20px;
-	    text-align: center;
+	    text-align: left;
 	    text-decoration: none;
 	    display: inline-block;
 	    font-size: 16px;
+	    width: 150pt;
 	}
 	.simple-button:hover {
-		background-color: #9adfff;
+		background-color: #3180a5;
 	}
 	.divimg {
 		border-width: 2px;
@@ -264,12 +265,17 @@
 <script>
 var TestApp = {
 		ws: undefined,
+		connected: false,
 		openSocket: function() {
+			if(TestApp.waitForOpen){
+				return;
+			}
 	        var url = 'ws://localhost:8887/';
 	        if(this.ws){
 	        	this.ws.close();
 	        }
-	        this.status('Проверка...');
+	        this.status('Не подключен');
+	        this.statusWait(true);
 	        
 	        this.ws = new WebSocket(url);
 	        this.ws.binaryType = 'arraybuffer'; // default is 'blob'
@@ -277,13 +283,19 @@ var TestApp = {
 	        var self = this;
 
 	        this.ws.onopen = function() {
-	        	connected = true;
+	        	self.connected = true;
 	        	self.waitForOpen = false;
 	        	self.status('Подключен');
+	        	self.statusWait(false);
+	        };
+	        this.ws.onclose = function() {
+	        	self.connected = false;
+	        	self.waitForOpen = false;
 	        };
 	        this.ws.onmessage = function(e) {
 	            	var i = e.data.indexOf('@@@@');
 	            	if(i > 0){
+	            		TestApp.statusWait(false);
 	            		//Image
 	            		var b64img = self.decrypt(e.data.substring(i + 4));
 	            		var json = e.data.substring(0, i);
@@ -293,6 +305,7 @@ var TestApp = {
 		            	//alert('Состояние: ' + e.data);
 		            	var json = self.recieve(e.data);
 		            	if(json && json.list){
+		            		TestApp.statusWait(false);
 		            		self.loadScannerList(json);
 		            	}
 		            	if(json && json.name){
@@ -400,11 +413,19 @@ var TestApp = {
 			    }
 			    select.appendChild(el);
 			}
+			if(items.length > 0){
+				TestApp.selectScanner(items[0]);
+			}
 	  	},
 		
 		status: function(text) {
         	var status = document.getElementById('socketStatus');
         	status.innerText = text;
+		},
+		
+		statusWait: function(wait) {
+        	var img = document.getElementById('imgStatus');
+        	img.style.display = (wait)?'inline-block':'none';
 		},
 		
 	    send: function(json) {
@@ -415,43 +436,67 @@ var TestApp = {
 	    },
 		
 		performScan: function() {
+			TestApp.statusWait(true);
 			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"PerformScan","data":{"feeder":false}}');
 		},
 		
 		performFeeder: function() {
+			TestApp.statusWait(true);
 			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"PerformScan","data":{"feeder":true}}');
 		},
 
 		listScan: function() {
+			TestApp.statusWait(true);
 			this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"GetScannerList"}');
 		},
 		
 	    selectScanner: function(scannerName) {
-	    	var o = {};
-	    	o.scannerName = scannerName;
 	    	this.send('{"uuid":"54a6e72005a0ecf45eec790f994da7e8","action":"SelectScanner","data":{"scannerName":' + scannerName + '}}')
-	    }
-}	
+	    },
+	    
+	    checkState: function(){
+			//alert('checkState');
+			if(TestApp && TestApp.ws && TestApp.connected){
+				//TestApp.status('Подключен');
+				//TestApp.statusWait(false);
+			} else {
+				TestApp.openSocket();
+			}
+			
+			setTimeout(TestApp.checkState, 2000);
+		}
+}
+window.onload = function(){
+	TestApp.checkState();
+}
+
 </script>
 <body>
-	<p><span style="font-size:32px; font-weight:bold;">Тест устройств сканирования Флекс</span></p>
-	<div>
-		<a class='simple-button skd-font' href='scanapp.jnlp' id='startBtn'>1. Запустить</a>
-	</div>
-		<br/>
+	<p><span style="font-size:32px; font-weight:bold;">Тест устройств сканирования на ТТ</span></p>
+	<div><span>Состояние: </span><span id=socketStatus></span><img id='imgStatus' style='display:none' src='loading16.gif'/></div>
 	<table cols="3">
 		<tr valign="top"><td>
+				<div><a href='scanapp.jnlp' id='startBtn'><button class='simple-button skd-font' onclick='TestApp.checkState();'>1. Запустить<img src='sc-red-16.png'/></button></a></div>
+		</td></tr>
+		<!--tr valign="top"><td>
+				<div><span>Состояние: </span><span id=socketStatus></span><img id='imgStatus' style='display:none' src='loading16.gif'/></div>
+		</td></tr-->
+		<tr valign="top"><td>
 				<div><button class='simple-button skd-font' id='socketBtn' onclick='TestApp.openSocket();'>2. Подключить</button></div>
-				<div style="font-size:4px;">&nbsp;</div>
-				<div><span>Состояние: </span><span id=socketStatus></span></div></td>
-				<td>
-				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.listScan();'>3. Список сканеров</button></div>
-				<div style="font-size:4px;">&nbsp;</div>
-				<div><select class='skd-font' id='cbScanners' onchange='TestApp.selectScanner(this.options[this.selectedIndex].value);'></select></div></td></tr>
+		</td></tr>
 		<tr valign="top"><td>
-				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performScan();'>4. Сканировать</button></div></td></tr>
+				<div style="font-size:4px;">&nbsp;</div>
+		</td></tr>
 		<tr valign="top"><td>
-				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performFeeder();'>5. С податчика</button></div></td></tr>
+				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.listScan();'>3. Список сканеров</button></div></td>
+				<td><select class='skd-font' id='cbScanners' onchange='TestApp.selectScanner(this.options[this.selectedIndex].value);'></select></td>
+		</td></tr>
+		<tr valign="top"><td>
+				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performScan();'>4. Сканировать</button></div>
+		</td></tr>
+		<tr valign="top"><td>
+				<div><button class='simple-button skd-font' id='scanBtn' onclick='TestApp.performFeeder();'>5. С податчика</button></div>
+		</td></tr>
 	</table>
 
 	<br/><br/>
