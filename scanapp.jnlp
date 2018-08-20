@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="https://try-to-scan.github.io/">
+<jnlp spec="1.0+" codebase="https://try-to-scan.github.io/" href="scanapp.jnlp">
     <information>
-         <title>AlfaBank агент физического сканера</title>
-         <vendor>AlfaBank QWERTY Team</vendor>
-         <description>AlfaBank агент физического сканера</description>
+	<title>AlfaBank сканер</title>
+	<vendor>AlfaBank QWERTY Team</vendor>
+	<description>AlfaBank сканер</description>
+    	<icon href="scanner-48.png"   width="48" height="48" />
+	<offline-allowed />
     </information>
     <security>
     	<all-permissions/>
